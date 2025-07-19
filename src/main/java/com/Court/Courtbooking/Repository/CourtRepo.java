@@ -13,7 +13,7 @@ import java.util.Optional;
 public interface CourtRepo extends JpaRepository<Court,Long> {
 
 
-    @Query(value = "SELECT * FROM Court WHERE arena_id = :arenaId", nativeQuery = true)
+    @Query(value = "SELECT * FROM Court WHERE sports_arena_id = :arenaId", nativeQuery = true)
     List<Court> findRoomsByArenaId(@Param("arenaId") Long arenaId);
 
     @Query(value = "SELECT count(*)>0 FROM Court WHERE  court_number=:courtNumber and sports_arena_id = :sportsArenaId", nativeQuery = true)
