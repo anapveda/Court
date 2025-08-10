@@ -14,13 +14,17 @@ public class CourtController {
     @Autowired
     private CourtService courtService;
 
-    @GetMapping("/{arenaId}")
+    @GetMapping("/arena/{arenaId}")
     public ResponseEntity<List<Court>> getRoomsBySportsArena(@PathVariable Long arenaId) {
         return ResponseEntity.ok(courtService.getAvailableCourts(arenaId));
     }
     @PostMapping("/add")
     public ResponseEntity<?> createCourt(@RequestBody Court court) {
         return courtService.addCourt(court);
+    }
+    @PostMapping("/book/{courtNumber}")
+    public ResponseEntity<?> bookCourt(@PathVariable String courtNumber){
+        return courtService.bookCourt(courtNumber);
     }
 
     @DeleteMapping("/delete/{courtNumber}")

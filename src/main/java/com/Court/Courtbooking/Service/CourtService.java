@@ -15,21 +15,12 @@ public class CourtService {
     CourtRepo courtRepo;
 
     public List<Court> getAvailableCourts(Long arenaId) {
-        return courtRepo.findRoomsByArenaId(arenaId);
+        return courtRepo.findAllCourtsByArenaId(arenaId);
     }
 
     public ResponseEntity<?> addCourt(Court court) {
-        Court c=new Court();
-       if(!courtRepo.findCourtByCourtNameAndArenaId(court.getCourtNumber(),court.getSportsArenaId())){
-          c.setCourtNumber(court.getCourtNumber());
-          c.setType(court.getType());
-          c.setPrice(court.getPrice());
-          c.setIsAvailable(court.getIsAvailable());
-          c.setSportsArenaId(court.getSportsArenaId());
-          courtRepo.save(c);
+          courtRepo.save(court);
           return ResponseEntity.ok(HttpStatus.OK);
-       }
-       return new ResponseEntity("Court Number already exist",HttpStatus.FORBIDDEN);
     }
 
     public ResponseEntity<?> deleteCourt(String courtNumber) {
@@ -38,5 +29,13 @@ public class CourtService {
             return ResponseEntity.ok(HttpStatus.OK);
         }
         return new ResponseEntity("Court Number doesnot exist",HttpStatus.FORBIDDEN);
+    }
+
+    public ResponseEntity<?> bookCourt(String courtNumber) {
+        if(courtRepo.findCourtByCourtNumberAndAvailability(courtNumber)){
+            courtRepo.setCourtNumberAvailabilityToFalse(courtNumber);
+            return ResponseEntity.ok(HttpStatus.OK);
+        }
+        return new ResponseEntity("Court Number is not available",HttpStatus.NOT_FOUND);
     }
 }
