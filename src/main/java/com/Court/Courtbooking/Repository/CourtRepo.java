@@ -27,9 +27,9 @@ public interface CourtRepo extends JpaRepository<Court,Long> {
     @Query(value = "UPDATE Court set is_avialable=false WHERE court_number = :courtNumber", nativeQuery = true)
     int setCourtNumberAvailabilityToFalse(@Param("courtNumber") String courtNumber);
 
-    @Query(value = "SELECT count(*)>0 FROM Court WHERE  court_number=:courtNumber and is_avialable=true", nativeQuery = true)
+    @Query(value = "SELECT count(*)>0 FROM Court WHERE  court_number=:courtNumber and is_available=true", nativeQuery = true)
     boolean findCourtByCourtNumberAndAvailability( @Param("courtNumber") String courtNumber);
-    @Query(value = "SELECT * FROM Court WHERE sports_arena_id = :arenaId and is_avialable=true", nativeQuery = true)
+    @Query(value = "SELECT * FROM Court WHERE sports_arena_id = :arenaId and is_available=true", nativeQuery = true)
     List<Court> findAllCourtsByArenaId(@Param("arenaId") Long arenaId);
 
     @Query(value = "SELECT count(*)>0 FROM Court WHERE  court_number=:courtNumber", nativeQuery = true)

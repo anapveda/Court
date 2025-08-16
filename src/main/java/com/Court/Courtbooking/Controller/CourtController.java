@@ -14,8 +14,8 @@ public class CourtController {
     @Autowired
     private CourtService courtService;
 
-    @GetMapping("/arena/{arenaId}")
-    public ResponseEntity<List<Court>> getRoomsBySportsArena(@PathVariable Long arenaId) {
+    @GetMapping("/{arenaId}")
+    public ResponseEntity<List<Court>> getAvailableCourts(@PathVariable Long arenaId) {
         return ResponseEntity.ok(courtService.getAvailableCourts(arenaId));
     }
     @PostMapping("/add")
