@@ -1,7 +1,9 @@
 package com.Court.Courtbooking.Controller;
 
+import com.Court.Courtbooking.Model.AssignCourtsRequest;
 import com.Court.Courtbooking.Model.Court;
 import com.Court.Courtbooking.Service.CourtService;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -31,6 +33,12 @@ public class CourtController {
     public ResponseEntity<?> deleteCourt(@PathVariable String courtNumber){
         return courtService.deleteCourt(courtNumber);
     }
+    @PutMapping("/assign")
+    public ResponseEntity<Void> assignCourtsToArena(@RequestBody AssignCourtsRequest request) {
+        courtService.updateArenaForCourts(request.getArenaId(), request.getCourtIds());
+        return ResponseEntity.noContent().build(); // 204 No Content
+    }
+
 }
 
 

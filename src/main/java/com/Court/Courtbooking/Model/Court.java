@@ -16,6 +16,7 @@ public class Court {
     private String type; // e.g. Single, Double
     private Double price;
     private Boolean isAvailable;
+    @Column(name = "sports_arena_id")
     private  Long sportsArenaId; // reference to Auditorium microservice
 
 }

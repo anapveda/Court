@@ -34,4 +34,9 @@ public interface CourtRepo extends JpaRepository<Court,Long> {
 
     @Query(value = "SELECT count(*)>0 FROM Court WHERE  court_number=:courtNumber", nativeQuery = true)
     boolean findCourtByCourtNumber(String courtNumber);
+
+    @Modifying(clearAutomatically = true, flushAutomatically = true)
+    @Transactional
+    @Query(value = "UPDATE court SET sports_arena_id = :arenaId WHERE id IN (:ids)", nativeQuery = true)
+    int updateArenaForCourts(@Param("arenaId") Long arenaId, @Param("ids") List<Long> ids);
 }
