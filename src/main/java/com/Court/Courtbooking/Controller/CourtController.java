@@ -1,6 +1,7 @@
 package com.Court.Courtbooking.Controller;
 
 import com.Court.Courtbooking.Model.AssignCourtsRequest;
+import com.Court.Courtbooking.Model.BookingRequest;
 import com.Court.Courtbooking.Model.Court;
 import com.Court.Courtbooking.Service.CourtService;
 import jakarta.transaction.Transactional;
@@ -37,6 +38,12 @@ public class CourtController {
     public ResponseEntity<Void> assignCourtsToArena(@RequestBody AssignCourtsRequest request) {
         courtService.updateArenaForCourts(request.getArenaId(), request.getCourtIds());
         return ResponseEntity.noContent().build(); // 204 No Content
+    }
+
+    @PostMapping("/book")
+    public ResponseEntity<Void> bookCourt(@RequestBody BookingRequest bookingRequest){
+        courtService.consumeBookingRequest(bookingRequest);
+        return ResponseEntity.noContent().build();
     }
 
 }

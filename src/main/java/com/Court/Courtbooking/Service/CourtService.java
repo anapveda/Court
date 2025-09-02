@@ -1,10 +1,16 @@
 package com.Court.Courtbooking.Service;
+import com.Court.Courtbooking.Enum.BookingStatus;
+import com.Court.Courtbooking.Model.BookingRequest;
+import com.Court.Courtbooking.Model.BookingResponse;
 import com.Court.Courtbooking.Model.Court;
 import com.Court.Courtbooking.Repository.CourtRepo;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.kafka.annotation.KafkaListener;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -16,6 +22,18 @@ import java.util.Optional;
 public class CourtService {
     @Autowired
     CourtRepo courtRepo;
+    /*
+    * The reason you still get an error even after annotating with @Autowired is because Spring cannot inject into a final field unless you use constructor injection.
+    * */
+
+    private final KafkaTemplate<String, BookingResponse> kafkaTemplate;
+    @Value("${topic.booking-responses}")
+    private String bookingResponsesTopic;
+
+    public CourtService(KafkaTemplate<String, BookingResponse> kafkaTemplate) {
+        this.kafkaTemplate = kafkaTemplate;
+    }
+
 
     public List<Court> getAvailableCourts(Long arenaId) {
         return courtRepo.findAllCourtsByArenaId(arenaId);
@@ -62,5 +80,27 @@ public class CourtService {
                 courtRepo.save(newCourt);
             }
         }
+    }
+
+    @KafkaListener(topics = "${topic.booking-requests}", groupId = "court-service", containerFactory = "bookingRequestListenerFactory")
+    public void consumeBookingRequest(BookingRequest bookingRequest) {
+        System.out.println("📥 CourtService got booking request: " + bookingRequest);
+
+        BookingResponse response = new BookingResponse();
+        response.setBookingId(bookingRequest.getBookingId());
+        Optional<Court> courtObject=courtRepo.findById(bookingRequest.getCourtId());
+
+        if (courtObject.isPresent() && Boolean.TRUE.equals(courtObject.get().getIsAvailable())) {
+            Court court = courtObject.get();
+            court.setIsAvailable(false); // mark reserved
+            courtRepo.save(court);
+            response.setStatus(BookingStatus.CONFIRMED);
+        } else {
+            response.setStatus(BookingStatus.REJECTED);
+        }
+
+        kafkaTemplate.send(bookingResponsesTopic, bookingRequest.getBookingId(), response);
+        System.out.println("📤 CourtService sent response: " + response);
+
     }
 }
