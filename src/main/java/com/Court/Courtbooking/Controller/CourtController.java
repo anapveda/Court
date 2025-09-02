@@ -40,11 +40,7 @@ public class CourtController {
         return ResponseEntity.noContent().build(); // 204 No Content
     }
 
-    @PostMapping("/book")
-    public ResponseEntity<Void> bookCourt(@RequestBody BookingRequest bookingRequest){
-        courtService.consumeBookingRequest(bookingRequest);
-        return ResponseEntity.noContent().build();
-    }
+
 
 }
 
