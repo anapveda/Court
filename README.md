@@ -94,6 +94,12 @@ Service runs at:
 
   ```http
   POST /courts/add
+  {
+"type":"Single",
+"price":23.89,
+"isAvailable":"True",
+"sportsArenaId":null
+}
   ```
 
 * **Delete Court**
