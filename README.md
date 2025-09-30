@@ -1,6 +1,7 @@
 # Court Service
 
-The **Court Service** is a Spring Boot microservice responsible for managing courts within sports arenas. It handles **court creation, booking, deletion, and assignment to arenas**, while also integrating with **Kafka** for asynchronous booking request/response communication.
+The **Court Service** is a Spring Boot microservice responsible for managing courts within sports arenas.
+It handles **court creation, booking, deletion, and assignment to arenas**, while also integrating with **Kafka** for asynchronous booking request/response communication.
 
 It is secured with **JWT authentication** and enforces **role-based access control** for `ADMIN` and `CUSTOMER` users.
 
@@ -10,7 +11,7 @@ It is secured with **JWT authentication** and enforces **role-based access contr
 
 * **Add Court** (Admin only)
 * **Delete Court** (Admin only)
-* **Book Court** (Customer)
+* **Book Court** (Customer only)
 * **Fetch Available Courts** by arena
 * **Assign Courts** to an Arena
 * **Kafka Integration**:
@@ -27,7 +28,7 @@ It is secured with **JWT authentication** and enforces **role-based access contr
 * **Spring Boot**: 3.x
 * **Spring Security + JWT**
 * **Spring Data JPA** with PostgreSQL
-* **Spring Kafka** for messaging
+* **Spring Kafka** (Consumer + Producer)
 * **Eureka Client** for service discovery
 * **Maven** for build & dependency management
 
@@ -94,16 +95,17 @@ Service runs at:
 
   ```http
   POST /courts/add
-   **Request Body:**
+  ```
+
+  **Request Body:**
 
   ```json
   {
-"type":"Single",
-"price":23.89,
-"isAvailable":"True",
-"sportsArenaId":null
-}
-  ```
+    "type": "Single",
+    "price": 23.89,
+    "isAvailable": true,
+    "sportsArenaId": null
+  }
   ```
 
 * **Delete Court**
@@ -117,8 +119,6 @@ Service runs at:
   ```http
   PUT /courts/assign
   ```
-
-
 
 * **Get Available Courts**
 
@@ -148,7 +148,8 @@ Service runs at:
 
    * If available → marks court unavailable & responds `CONFIRMED`.
    * If unavailable → responds `REJECTED`.
-3. Sends response to `booking-responses`.
+3. **Court Service** publishes response to `booking-responses`.
+4. **Booking Service** consumes response and updates booking status.
 
 ---
 
@@ -158,16 +159,16 @@ Service runs at:
 sequenceDiagram
     participant B as Booking Service
     participant K as Kafka
-    participant CS as Court Service
+    participant C as Court Service
     participant DB as CourtRepo
 
     B->>K: Publish BookingRequest (booking-requests)
-    K->>CS: Deliver BookingRequest
-    CS->>DB: Validate & update court availability
+    K->>C: Deliver BookingRequest
+    C->>DB: Validate & update court availability
     alt Court Available
-        CS->>K: Publish BookingResponse(CONFIRMED)
+        C->>K: Publish BookingResponse(CONFIRMED)
     else Court Unavailable
-        CS->>K: Publish BookingResponse(REJECTED)
+        C->>K: Publish BookingResponse(REJECTED)
     end
     K->>B: Deliver BookingResponse
 ```
