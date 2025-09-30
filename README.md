@@ -94,12 +94,16 @@ Service runs at:
 
   ```http
   POST /courts/add
+   **Request Body:**
+
+  ```json
   {
 "type":"Single",
 "price":23.89,
 "isAvailable":"True",
 "sportsArenaId":null
 }
+  ```
   ```
 
 * **Delete Court**
@@ -114,14 +118,7 @@ Service runs at:
   PUT /courts/assign
   ```
 
-  **Request Body:**
 
-  ```json
-  {
-    "arenaId": 1,
-    "courtIds": [101, 102]
-  }
-  ```
 
 * **Get Available Courts**
 
